@@ -8,6 +8,10 @@ class LRUCacheTest(unittest.TestCase):
     def setUp(self):
         self.cache = LRUCache(3)
 
+    def test_bad_capacity(self):
+        with self.assertRaises(ValueError):
+            self.cache = LRUCache(-2)
+
     def test_set_element(self):
         self.cache.set("3", "three")
         self.assertEqual("three", self.cache.get("3"))
