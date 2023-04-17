@@ -1,57 +1,27 @@
-from lab1.cache.node import Node
-import string
+from collections import OrderedDict
+
 
 class LRUCache:
     def __init__(self, capacity: int = 10) -> None:
         if capacity <= 0:
             raise ValueError("Capacity must be greater then zero")
+        self.cache = OrderedDict()
         self.capacity = capacity
-        self.cache = {}
-        self.head = Node()
-        self.tail = Node()
-        self.head.next = self.tail
-        self.tail.prev = self.head
 
     def get(self, key: str) -> str:
-        res: string
-
-        if key in self.cache:
-            node = self.cache[key]
-            self._remove(node)
-            self._add(node)
-            res = node.value
+        if key not in self.cache:
+            return ""
         else:
-            res = ""
-
-        return res
+            self.cache.move_to_end(key)
+            return self.cache[key]
 
     def set(self, key: str, value: str) -> None:
-        if key in self.cache:
-            self._remove(self.cache[key])
-
-        node = Node(key, value)
-        self.cache[key] = node
-        self._add(node)
-
+        self.cache[key] = value
+        self.cache.move_to_end(key)
         if len(self.cache) > self.capacity:
-            self.remove(self.head.next.key)
+            self.cache.popitem(last=False)
 
     def remove(self, key: str) -> None:
-        if key in self.cache:
-            node = self.cache[key]
-            self._remove(node)
-            del self.cache[key]
+        del self.cache[key]
 
 
-    def _add(self, node):
-        prev = self.tail.prev
-        prev.next = node
-        node.prev = prev
-        node.next = self.tail
-        self.tail.prev = node
-
-    def _remove(self, node):
-        prev = node.prev
-        next = node.next
-        prev.next = next
-        next.prev = prev
